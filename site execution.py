@@ -3,7 +3,7 @@ t_start = time()
 
 import requests
 from bs4 import BeautifulSoup
-from pprint import pprint
+
 
 
 def make_drug_url(drug_url):
@@ -37,4 +37,29 @@ elapsed = t_finish - t_start
 print(elapsed)
 
 #%%
+help('fdsa'.find)
+#%%
+from bs4 import BeautifulSoup
+file = open('sinupret.html',encoding='UTF-8')
+soup = BeautifulSoup(file)
+print(soup.prettify())
+tag = soup.a
+print(tag,'\n')
+print(tag.attrs,'\n')
+print(tag['class'],'\n')
+print(type(tag.string),'\n')
+print(str(tag.string),'\n')
+tag.string.replace_with('Саня хуй соси')
+print(tag.string,'\n')
+print()
+
+
+
+
+
+
+#for tag in soup.find_all('a'):
+
+
+
 
