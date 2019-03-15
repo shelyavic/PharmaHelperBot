@@ -42,6 +42,9 @@ help('fdsa'.find)
 from bs4 import BeautifulSoup
 file = open('sinupret.html',encoding='UTF-8')
 soup = BeautifulSoup(file)
+file.close()
+#%%
+import gc
 print(soup.prettify())
 tag = soup.a
 print(tag,'\n')
@@ -51,11 +54,12 @@ print(type(tag.string),'\n')
 print(str(tag.string),'\n')
 tag.string.replace_with('Саня хуй соси')
 print(tag.string,'\n')
-print()
-
-
-
-
+print('==================')
+head_tag = soup.head
+print(type(head_tag.contents),'\n')
+print(type(head_tag.children),'\n')
+print(type(soup.descendants))
+help()
 
 
 #for tag in soup.find_all('a'):
