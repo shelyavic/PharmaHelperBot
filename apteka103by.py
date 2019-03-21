@@ -79,15 +79,6 @@ def get_result(drug_id):
 #              drug_passport['ftg'] + '\n\n' +
 #              'Инструкция по применению:' + '\n')
     
-#    print(drug_passport['title'])
-#    print("Форма:", drug_passport['mainForm'],drug_passport['pharmaceuticalForm'])
-#    print("Производитель:", drug_passport['manufacturer'])
-#    print('Международное непатентованное название (МНН):',
-#      drug_passport['mnn'])
-#    print('Фармакотерапевтическая группа (ФТГ):',
-#      drug_passport['ftg'])
-#    print('Инструкция по применению')
-    
     html = response_json['data']['instruction']['text']
     if html == None:
         result.append('Нет дополнительной информации по препарату.\
