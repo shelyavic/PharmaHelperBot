@@ -1,7 +1,6 @@
 import requests
-from config import TOKEN
 from pprint import pprint
-
+import os
 import apteka103by as apteka
 
 
@@ -35,6 +34,11 @@ class SimpleBot:
         return resp
 
 def main():
+    TOKEN = os.environ.get('TOKEN',None)
+    if TOKEN == None:
+        file = open('./config.txt')
+        TOKEN = file.read()
+        file.close()
     my_bot = SimpleBot(TOKEN)
 #    second_upd = None
     while True:
