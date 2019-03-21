@@ -46,7 +46,11 @@ def main():
         pprint(first_upd)
         first_upd_text = first_upd['message']['text']
         first_upd_id = first_upd['message']['chat']['id']
-        drugs = apteka.find_drugs(first_upd_text)
+        try:
+            drugs = apteka.find_drugs(first_upd_text)
+        except Exception as e:
+            my_bot.send_message(first_upd_id,e)
+            continue
         drug = drugs[0]
         drug_id = apteka.get_drug_id(drug['url'])
 #        message = apteka.get_result(drug_id)
@@ -57,10 +61,10 @@ def main():
             my_bot.send_message(first_upd_id,item)
         
         if result_array[-1] == None:
-            my_bot.send_message(first_upd_id,'Нет дополнительной информации\
-                                по препарату.\
-                                Возможно, препарат отсутствует в продаже \n\
-                                или отсутствует описание в принципе \n\
+            my_bot.send_message(first_upd_id,'Нет дополнительной информации \
+                                по препарату. \
+                                Возможно, препарат отсутствует в продаже \n \
+                                или отсутствует описание в принципе \n \
                                 Попробуйте один из вариантов:')
             message = ''
             for i in range(len(drugs)):
