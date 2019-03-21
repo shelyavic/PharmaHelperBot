@@ -1,9 +1,10 @@
-import requests
-from bs4 import BeautifulSoup
-#import re
 
 
 #%%
+import requests
+from bs4 import BeautifulSoup
+import re
+
     
 def find_drugs(search_name='синупрет'):
     """
@@ -17,6 +18,8 @@ def find_drugs(search_name='синупрет'):
     search_url = 'https://pharmacy-search.103.by/suggest/all?q='
     search_response = requests.get(search_url + search_name)
     search_response_json = search_response.json()
+    if search_response_json['data'] == []:
+        raise Exception('Can not find ' + search_name)
     drugs = search_response_json['data'][0]['entities']
     return drugs
 
@@ -54,15 +57,28 @@ def get_result(drug_id):
     response = requests.get(url+str(drug_id))
     response_json = response.json()
     drug_passport = response_json['data']['drug']
-    result = (drug_passport['title'] + '\n' + 
-              "Форма:" + drug_passport['mainForm'] +
-              drug_passport['pharmaceuticalForm'] + '\n' +
-              "Производитель:" + drug_passport['manufacturer'] +'\n' +
-              'Международное непатентованное название (МНН):' +
-              drug_passport['mnn'] + '\n' +
-              'Фармакотерапевтическая группа (ФТГ):' +
-              drug_passport['ftg'] + '\n\n' +
-              'Инструкция по применению:' + '\n')
+    result = []
+    result.append(drug_passport['title'])
+    result.append("Форма: " + drug_passport['mainForm'] + ' ' +
+              drug_passport['pharmaceuticalForm'])
+    result.append("Производитель: " + drug_passport['manufacturer'])
+    mnn = re.search('>?(~|\w+)<?',drug_passport['mnn']).group(1)
+    result.append('Международное непатентованное название (МНН): ' +
+              mnn)
+    result.append('Фармакотерапевтическая группа (ФТГ): ' +
+              drug_passport['ftg'])
+    result.append('Инструкция по применению: ' )
+    
+#    result = (drug_passport['title'] + '\n' + 
+#              "Форма:" + drug_passport['mainForm'] + ' ' +
+#              drug_passport['pharmaceuticalForm'] + '\n' +
+#              "Производитель:" + drug_passport['manufacturer'] +'\n' +
+#              'Международное непатентованное название (МНН):' +
+#              drug_passport['mnn'] + '\n' +
+#              'Фармакотерапевтическая группа (ФТГ):' +
+#              drug_passport['ftg'] + '\n\n' +
+#              'Инструкция по применению:' + '\n')
+    
 #    print(drug_passport['title'])
 #    print("Форма:", drug_passport['mainForm'],drug_passport['pharmaceuticalForm'])
 #    print("Производитель:", drug_passport['manufacturer'])
@@ -71,30 +87,43 @@ def get_result(drug_id):
 #    print('Фармакотерапевтическая группа (ФТГ):',
 #      drug_passport['ftg'])
 #    print('Инструкция по применению')
-
+    
     html = response_json['data']['instruction']['text']
-    drug_soup = BeautifulSoup(
-        markup=html, 
-        features='html.parser')
-    for tag in drug_soup.find_all(string=True):
-        result+=(tag.string+'\r')
-    return result
+    if html == None:
+        result.append('Нет дополнительной информации по препарату.\
+                      Возможно, препарат отсутствует в продаже')
+        return result
+    else:
+        drug_soup = BeautifulSoup(
+            markup=html, 
+            features='html.parser')
+        for tag in drug_soup.find_all(string=True):
+    #        result+=(tag.string + '\r')
+            result.append(tag)
+        return result
+
+
+def main():    
+    drug_input = str(input("Какое лекарство будем искать?\n"))
+    try:
+        drugs = find_drugs(drug_input)
+    except Exception as e:
+        print(e)
+    else:
+        for i in range(len(drugs)):
+            print(i, '.', drugs[i]['title'], sep='')
+            
+        choice = int(input())
+        drug_url_piece = drugs[choice]['url']
+        drug_id = get_drug_id(drug_url_piece)
+        result = get_result(drug_id)
+        print(result)
+
+if __name__ == '__main__':
+    main()
 
 
 #%%
-#drug_input = str(input("Какое лекарство будем искать?\n"))
-#drugs = search_drug(drug_input)
-#for i in range(len(drugs)):
-#    print(i, '.', drugs[i]['title'], sep='')
-#    
-#choice = int(input())
-#drug_url_piece = drugs[choice]['url']
-#drug_id = get_drug_id(drug_url_piece)
-#result = get_result(drug_id)
-#print(result)
-#
-#
-
 
 
 

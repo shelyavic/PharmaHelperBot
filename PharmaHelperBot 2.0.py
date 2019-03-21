@@ -1,10 +1,10 @@
 import requests
+from config import TOKEN
 from pprint import pprint
 
 import apteka103by as apteka
 
 
-TOKEN = ""
 class SimpleBot:
     def __init__(self, token):
         self.__token = token
@@ -34,25 +34,37 @@ class SimpleBot:
         resp = requests.post(self.__api_url + method, params)
         return resp
 
-        
-
-#greetings = ('здравствуй', 'привет', 'ку', 'здорово')
-#now = datetime.datetime.now()
-
-
 def main():
     my_bot = SimpleBot(TOKEN)
+#    second_upd = None
     while True:
-        last_update = my_bot.get_last_update()
-        pprint(last_update)
-        last_chat_text = last_update['message']['text']
-        last_chat_id = last_update['message']['chat']['id']
-        drugs = apteka.find_drugs(last_chat_text)
-        message = ''
-        for i in range(len(drugs)):
-            message +=( str(i) + '.' + drugs[i]['title']+'\n')
-        my_bot.send_message(last_chat_id,message)
-                
+#        if second_update == None:
+#            first_upd = my_bot.get_last_update()
+#        else:
+#            first_upd = second_upd
+        first_upd = my_bot.get_last_update()
+        pprint(first_upd)
+        first_upd_text = first_upd['message']['text']
+        first_upd_id = first_upd['message']['chat']['id']
+        drugs = apteka.find_drugs(first_upd_text)
+        drug = drugs[0]
+        drug_id = apteka.get_drug_id(drug['url'])
+#        message = apteka.get_result(drug_id)
+#        my_bot.send_message(first_upd_id,message)
+        array = apteka.get_result(drug_id)
+        for item in array:    
+            my_bot.send_message(first_upd_id,item)
+
+#        message = ''
+#        for i in range(len(drugs)):
+#            message +=( str(i) + '.' + drugs[i]['title']+'\n')
+#        my_bot.send_message(first_upd_id,message)
+#        
+#        second_upd = my_bot.get_last_update()
+#        second_upd_id = second_upd['message']['chat']['id']
+#        if second_upd_id != first_upd_id:
+#            continue            
+
 if __name__ == '__main__':
     try:
         main()
@@ -61,9 +73,6 @@ if __name__ == '__main__':
         
         
 #%%
-import apteka103by as apteka
-drugs = apteka.find_drugs()
-    
     
     
     
