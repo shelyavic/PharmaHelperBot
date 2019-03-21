@@ -31,8 +31,10 @@ def get_drug_id(drug_url_piece):
     soup = BeautifulSoup(markup=drug_html, features='html.parser')
     
     #find with standart BS function
-    tag_st = soup.find('a',attrs={'data-drug':True})
-    drug_id = tag_st['data-drug']
+    tag_standart = soup.find('a',attrs={'data-drug':True,'href':True})
+    if tag_standart == None:
+        tag_standart = soup.find('a',attrs={'data-drug':True})
+    drug_id = tag_standart['data-drug']
     
     """
     #find with regular expression(HARD)
@@ -81,17 +83,16 @@ def get_result(drug_id):
     
     html = response_json['data']['instruction']['text']
     if html == None:
-        result.append('Нет дополнительной информации по препарату.\
-                      Возможно, препарат отсутствует в продаже')
-        return result
+        result.append(None)
+#        finally:
+#            return result
     else:
-        drug_soup = BeautifulSoup(
-            markup=html, 
-            features='html.parser')
+        drug_soup = BeautifulSoup(markup=html, 
+                              features='html.parser')
         for tag in drug_soup.find_all(string=True):
-    #        result+=(tag.string + '\r')
+#            result+=(tag.string + '\r')
             result.append(tag)
-        return result
+    return result
 
 
 def main():    

@@ -51,15 +51,22 @@ def main():
         drug_id = apteka.get_drug_id(drug['url'])
 #        message = apteka.get_result(drug_id)
 #        my_bot.send_message(first_upd_id,message)
-        array = apteka.get_result(drug_id)
-        for item in array:    
+        result_array = apteka.get_result(drug_id)
+        
+        for item in result_array:    
             my_bot.send_message(first_upd_id,item)
-
-#        message = ''
-#        for i in range(len(drugs)):
-#            message +=( str(i) + '.' + drugs[i]['title']+'\n')
-#        my_bot.send_message(first_upd_id,message)
-#        
+        
+        if result_array[-1] == None:
+            my_bot.send_message(first_upd_id,'Нет дополнительной информации\
+                                по препарату.\
+                                Возможно, препарат отсутствует в продаже \n\
+                                или отсутствует описание в принципе \n\
+                                Попробуйте один из вариантов:')
+            message = ''
+            for i in range(len(drugs)):
+                message +=( str(i) + '.' + drugs[i]['title']+'\n')
+            my_bot.send_message(first_upd_id,message)
+                                        
 #        second_upd = my_bot.get_last_update()
 #        second_upd_id = second_upd['message']['chat']['id']
 #        if second_upd_id != first_upd_id:
