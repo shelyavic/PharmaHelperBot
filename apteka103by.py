@@ -19,7 +19,7 @@ def find_drugs(search_name='синупрет'):
     search_response = requests.get(search_url + search_name)
     search_response_json = search_response.json()
     if search_response_json['data'] == []:
-        raise Exception('Can not find ' + search_name)
+        raise Exception('Не могу найти ' + search_name)
     drugs = search_response_json['data'][0]['entities']
     return drugs
 
@@ -83,7 +83,9 @@ def get_result(drug_id):
     
     html = response_json['data']['instruction']['text']
     if html == None:
-        result.append(None)
+        result.append('Нет дополнительной информации \
+по препарату. Возможно, препарат отсутствует в продаже \
+или описание отсутвтвует в принципе')
 #        finally:
 #            return result
     else:
@@ -91,6 +93,8 @@ def get_result(drug_id):
                               features='html.parser')
         for tag in drug_soup.find_all(string=True):
 #            result+=(tag.string + '\r')
+            if tag.string == '\n':
+                continue
             result.append(tag)
     return result
 
