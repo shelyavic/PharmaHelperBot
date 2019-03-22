@@ -5,6 +5,7 @@ import os
 import telebot
 import apteka103by as parser
 from Task import Task
+import markups as m
 
 TOKEN = os.environ.get('TOKEN',None)
 if TOKEN == None:
@@ -14,6 +15,7 @@ if TOKEN == None:
 
 bot = telebot.TeleBot(TOKEN)
 task = Task()
+
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
@@ -29,10 +31,11 @@ def askAge(message):
     chat_id = message.chat.id
     text = message.text
     if not text.isdigit():
-        msg = bot.send_message(chat_id, 'Возраст должен быть числом, введите ещё раз.')
+        msg = bot.send_message(chat_id, 'Возраст должен быть числом, введи ещё раз.')
         bot.register_next_step_handler(msg, askAge) #askSource
         return
-    bot.send_message(chat_id, 'Спасибо, я запомнил что тебе ' + text + ' лет.')
+    bot.send_message(chat_id, 'Спасибо, я запомнил что тебе ' +
+                     text + ' лет.', reply_markup=m.start_markup)
     task.isRunning = False
 
 @bot.message_handler(commands=['find'])
@@ -59,7 +62,7 @@ def find_drugs(message):
 def make_choice_and_find_drug(message):
     chat_id = message.chat.id
     text = message.text
-    if not (int(text)>=0 and int(text)<len(task.drugs) ) :
+    if not text.isdigit() or not (int(text)>=0 and int(text)<len(task.drugs) ) :
         msg = bot.send_message(chat_id,'Введи число от 0'+ ' до '+
                                str(len(task.drugs)-1))
         bot.register_next_step_handler(msg, make_choice_and_find_drug)
@@ -71,7 +74,7 @@ def make_choice_and_find_drug(message):
     mess = ''
     for item in result_array:    
         mess += (item + '\n'+'\n')#bot.send_message(chat_id,item)
-    bot.send_message(chat_id, mess)
+    bot.send_message(chat_id, mess,reply_markup=m.start_markup)
     task.isRunning = False    
     
 @bot.message_handler(content_types=['text'])
@@ -79,16 +82,16 @@ def text_handler(message):
     text = message.text.lower()
     chat_id = message.chat.id
     if text == "привет":
-        bot.send_message(chat_id, 'Привет, я бот - парсер 103.by .')
+        bot.send_message(chat_id, 'Привет, я бот - парсер 103.by .',reply_markup=m.start_markup)
     elif text == "как дела?":
-        bot.send_message(chat_id, 'Хорошо, а у тебя?')
+        bot.send_message(chat_id, 'Хорошо, а у тебя?',reply_markup=m.start_markup)
     else:
-        bot.send_message(chat_id, 'Прости, я тебя не понял :(')
+        bot.send_message(chat_id, 'Прости, я тебя не понял :(',reply_markup=m.start_markup)
 
 @bot.message_handler(content_types=['photo'])
 def text_handler(message):
     chat_id = message.chat.id
-    bot.send_message(chat_id, 'Красиво.')
+    bot.send_message(chat_id, 'Красиво.',reply_markup=m.start_markup)
     
 bot.polling(none_stop=True)
     
