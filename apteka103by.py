@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-    
+
 def find_drugs(search_name='синупрет'):
     """
     Function for searhing drugs on 103.by
@@ -29,29 +29,29 @@ def get_drug_id(drug_url_piece):
     drug_site_response = requests.get(drug_url_full)
     drug_html = drug_site_response.text
     soup = BeautifulSoup(markup=drug_html, features='html.parser')
-    
+
     #find with standart BS function
     tag_standart = soup.find('a',attrs={'data-drug':True,'href':True})
     if tag_standart == None:
         tag_standart = soup.find('a',attrs={'data-drug':True})
     drug_id = tag_standart['data-drug']
-    
+
     """
     #find with regular expression(HARD)
     match = re.search("data-drug=\"(\d+)\"",drug_html)
     print(match.group(1))
-    
+
     #find with regular expression(EASY)
     tag_re = soup.find(re.compile(r"^a"),attrs={'data-drug':re.compile(r"\d+")})
     print('RegExp: ',tag_re)
     print(tag_re['data-drug'])
-    
+
     #find with css selectors
     tag_css = soup.select_one('a[data-drug]')
     print(tag_css)
     print(tag_css['data-drug'])
     """
-    
+
     return drug_id
 
 def get_result(drug_id):
@@ -70,8 +70,8 @@ def get_result(drug_id):
     result.append('Фармакотерапевтическая группа (ФТГ): ' +
               drug_passport['ftg'])
     result.append('Инструкция по применению: ' )
-    
-#    result = (drug_passport['title'] + '\n' + 
+
+#    result = (drug_passport['title'] + '\n' +
 #              "Форма:" + drug_passport['mainForm'] + ' ' +
 #              drug_passport['pharmaceuticalForm'] + '\n' +
 #              "Производитель:" + drug_passport['manufacturer'] +'\n' +
@@ -80,7 +80,7 @@ def get_result(drug_id):
 #              'Фармакотерапевтическая группа (ФТГ):' +
 #              drug_passport['ftg'] + '\n\n' +
 #              'Инструкция по применению:' + '\n')
-    
+
     html = response_json['data']['instruction']['text']
     if html == None:
         result.append('Нет дополнительной информации \
@@ -89,17 +89,20 @@ def get_result(drug_id):
 #        finally:
 #            return result
     else:
-        drug_soup = BeautifulSoup(markup=html, 
+        drug_soup = BeautifulSoup(markup=html,
                               features='html.parser')
         for tag in drug_soup.find_all(string=True):
 #            result+=(tag.string + '\r')
-            if tag.string == '\n':
+            if tag.string == '\n' or tag.string == ' ':
+                continue
+            if tag.string == ', ':
+                result[-1] += (', ')
                 continue
             result.append(tag)
     return result
 
 
-def main():    
+def main():
     drug_input = str(input("Какое лекарство будем искать?\n"))
     try:
         drugs = find_drugs(drug_input)
@@ -108,7 +111,7 @@ def main():
     else:
         for i in range(len(drugs)):
             print(i, '.', drugs[i]['title'], sep='')
-            
+
         choice = int(input())
         drug_url_piece = drugs[choice]['url']
         drug_id = get_drug_id(drug_url_piece)

@@ -6,6 +6,7 @@ import telebot
 import apteka103by as parser
 from Task import Task
 import markups as m
+from telebot import util
 
 TOKEN = os.environ.get('TOKEN',None)
 if TOKEN == None:
@@ -72,11 +73,13 @@ def make_choice_and_find_drug(message):
     drug_id = parser.get_drug_id(drug_url_piece)
     result_array = parser.get_result(drug_id)
     mess = ''
-    for item in result_array:    
-        mess += (item + '\n'+'\n')#bot.send_message(chat_id,item)
-    bot.send_message(chat_id, mess,reply_markup=m.start_markup)
-    task.isRunning = False    
-    
+    for item in result_array:
+        mess += (item + '\n'+'\n')# bot.send_message(chat_id,item)
+    splitted_text = util.split_string(mess, 3000)
+    for text in splitted_text:
+        bot.send_message(chat_id, text,reply_markup=m.start_markup)
+    task.isRunning = False
+
 @bot.message_handler(content_types=['text'])
 def text_handler(message):
     text = message.text.lower()
@@ -92,7 +95,7 @@ def text_handler(message):
 def text_handler(message):
     chat_id = message.chat.id
     bot.send_message(chat_id, 'Красиво.',reply_markup=m.start_markup)
-    
+
 bot.polling(none_stop=True)
-    
+
 #%%
