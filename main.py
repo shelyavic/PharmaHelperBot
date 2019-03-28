@@ -71,13 +71,13 @@ def make_choice_and_find_drug(message):
     choice = int(text)
     drug_url_piece = task.drugs[choice]['url']
     drug_id = parser.get_drug_id(drug_url_piece)
-    result_array = parser.get_result(drug_id)
-    mess = ''
-    for item in result_array:
-        mess += (item + '\n'+'\n')# bot.send_message(chat_id,item)
-    splitted_text = util.split_string(mess, 3000)
-    for text in splitted_text:
-        bot.send_message(chat_id, text,reply_markup=m.start_markup)
+    result_dict = parser.get_result(drug_id)
+    for item in result_dict.items():
+        mess = (item[0] + ':' + '\n'+'\n' + item[1])
+        bot.send_message(chat_id, mess,reply_markup=m.start_markup)
+#    splitted_text = util.split_string(mess, 3000)
+#    for text in splitted_text:
+#        bot.send_message(chat_id, text,reply_markup=m.start_markup)
     task.isRunning = False
 
 @bot.message_handler(content_types=['text'])

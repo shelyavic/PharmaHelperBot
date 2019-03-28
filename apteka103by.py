@@ -4,7 +4,7 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-
+from pprint import pprint
 
 def find_drugs(search_name='синупрет'):
     """
@@ -53,23 +53,23 @@ def get_drug_id(drug_url_piece):
     """
 
     return drug_id
+##%%
 
+
+##%%
 def get_result(drug_id):
     url = 'https://apteka.103.by/api/v2/sku/'
     response = requests.get(url+str(drug_id))
     response_json = response.json()
     drug_passport = response_json['data']['drug']
-    result = []
-    result.append(drug_passport['title'])
-    result.append("Форма: " + drug_passport['mainForm'] + ' ' +
+    result = {}
+    result['Название'] = drug_passport['title']
+    result["Форма"] =( drug_passport['mainForm'] + ' ' +
               drug_passport['pharmaceuticalForm'])
-    result.append("Производитель: " + drug_passport['manufacturer'])
+    result["Производитель"] = drug_passport['manufacturer']
     mnn = re.search('>?(~|\w+)<?',drug_passport['mnn']).group(1)
-    result.append('Международное непатентованное название (МНН): ' +
-              mnn)
-    result.append('Фармакотерапевтическая группа (ФТГ): ' +
-              drug_passport['ftg'])
-    result.append('Инструкция по применению: ' )
+    result['Международное непатентованное название (МНН)'] = mnn
+    result['Фармакотерапевтическая группа (ФТГ)'] = drug_passport['ftg']
 
 #    result = (drug_passport['title'] + '\n' +
 #              "Форма:" + drug_passport['mainForm'] + ' ' +
@@ -80,25 +80,28 @@ def get_result(drug_id):
 #              'Фармакотерапевтическая группа (ФТГ):' +
 #              drug_passport['ftg'] + '\n\n' +
 #              'Инструкция по применению:' + '\n')
-
-    html = response_json['data']['instruction']['text']
-    if html == None:
-        result.append('Нет дополнительной информации \
+    print(response_json['data']['instruction']['paragraphs'])
+    list_info = response_json['data']['instruction']['paragraphs']
+    if list_info == []:
+        result['Дополнительная информация'] = 'Нет дополнительной информации \
 по препарату. Возможно, препарат отсутствует в продаже \
-или описание отсутвтвует в принципе')
+или описание отсутcтвует в принципе'
 #        finally:
 #            return result
     else:
-        drug_soup = BeautifulSoup(markup=html,
+        for item in list_info:
+            text_soup = BeautifulSoup(markup=item['text'],
                               features='html.parser')
-        for tag in drug_soup.find_all(string=True):
-#            result+=(tag.string + '\r')
-            if tag.string == '\n' or tag.string == ' ':
-                continue
-            if tag.string == ', ':
-                result[-1] += (', ')
-                continue
-            result.append(tag)
+            my_text = ''
+            for tag in text_soup.find_all(string=True):
+    #            result+=(tag.string + '\r')
+                if tag.string in ['\n','\r\n',' ']:
+                    continue
+                if tag.string == ', ':
+                    result[-1] += (', ')
+                    continue
+                my_text += tag.string
+            result[item['heading']]= my_text
     return result
 
 
@@ -117,12 +120,12 @@ def main():
         drug_id = get_drug_id(drug_url_piece)
         result = get_result(drug_id)
         print(result)
+        for item in result.items():
+            print(item)
 
 if __name__ == '__main__':
     main()
 
 
 #%%
-
-
 
