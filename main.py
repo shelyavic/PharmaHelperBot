@@ -6,7 +6,6 @@ import telebot
 import apteka103by as parser
 from Task import Task
 import markups as m
-from telebot import util
 
 TOKEN = os.environ.get('TOKEN',None)
 if TOKEN == None:
@@ -20,8 +19,7 @@ task = Task()
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
-    bot.send_message(message.chat.id , 'Привет, когда я вырасту, я буду \
-                     парсить сайт 103.by')
+    bot.send_message(message.chat.id , 'Привет могу найти информацию по лекарству на сайте 103.by')
     if not task.isRunning:
         chat_id = message.chat.id
         msg = bot.send_message(chat_id, 'Сколько тебе лет?')
