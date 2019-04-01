@@ -4,7 +4,6 @@
 import requests
 from bs4 import BeautifulSoup
 import re
-from pprint import pprint
 
 def find_drugs(search_name='синупрет'):
     """
@@ -51,10 +50,8 @@ def get_drug_id(drug_url_piece):
     print(tag_css)
     print(tag_css['data-drug'])
     """
-
     return drug_id
 ##%%
-
 
 ##%%
 def get_result(drug_id):
@@ -80,7 +77,7 @@ def get_result(drug_id):
 #              'Фармакотерапевтическая группа (ФТГ):' +
 #              drug_passport['ftg'] + '\n\n' +
 #              'Инструкция по применению:' + '\n')
-    print(response_json['data']['instruction']['paragraphs'])
+    #print(response_json['data']['instruction']['paragraphs'])
     list_info = response_json['data']['instruction']['paragraphs']
     if list_info == []:
         result['Дополнительная информация'] = 'Нет дополнительной информации \
@@ -97,9 +94,9 @@ def get_result(drug_id):
     #            result+=(tag.string + '\r')
                 if tag.string in ['\n','\r\n',' ']:
                     continue
-                if tag.string == ', ':
-                    result[-1] += (', ')
-                    continue
+#                if tag.string == ', ':
+#                    result[-1] += (', ')
+#                    continue
                 my_text += tag.string
             result[item['heading']]= my_text
     return result

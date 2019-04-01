@@ -1,6 +1,5 @@
 
 #%%
-
 import os
 import telebot
 import apteka103by as parser
@@ -19,7 +18,7 @@ task = Task()
 
 @bot.message_handler(commands=['start'])
 def start_handler(message):
-    bot.send_message(message.chat.id , 'Привет могу найти информацию по лекарству на сайте 103.by')
+    bot.send_message(message.chat.id , 'Привет! Я могу найти информацию по лекарству на сайте 103.by')
     if not task.isRunning:
         chat_id = message.chat.id
         msg = bot.send_message(chat_id, 'Сколько тебе лет?')
@@ -86,8 +85,11 @@ def text_handler(message):
         bot.send_message(chat_id, 'Привет, я бот - парсер 103.by .',reply_markup=m.start_markup)
     elif text == "как дела?":
         bot.send_message(chat_id, 'Хорошо, а у тебя?',reply_markup=m.start_markup)
+    #elif text ==
     else:
-        bot.send_message(chat_id, 'Прости, я тебя не понял :(',reply_markup=m.start_markup)
+
+        bot.send_message(chat_id, 'Прости, я тебя не понял :( '+text ,reply_markup=m.start_markup)
+        print(text)
 
 @bot.message_handler(content_types=['photo'])
 def text_handler(message):
