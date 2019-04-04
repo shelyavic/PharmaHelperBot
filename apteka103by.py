@@ -60,12 +60,12 @@ def get_result(drug_id):
     response_json = response.json()
     drug_passport = response_json['data']['drug']
     #print(drug_passport)
-    result = {}
+    result = dict()
     result['Название'] = drug_passport['title']
     result["Форма"] =( drug_passport['mainForm'] + ' ' +
               drug_passport['pharmaceuticalForm'])
     result["Производитель"] = drug_passport['manufacturer']
-    mnn = re.search(r'([А-я]+\s?)+',drug_passport['mnn']).group(0)
+    mnn = re.search(r'~|([А-я]+\s?)+',drug_passport['mnn']).group(0)
     #print(mnn)
     result['Международное непатентованное название (МНН)'] = mnn
     result['Фармакотерапевтическая группа (ФТГ)'] = drug_passport['ftg']
